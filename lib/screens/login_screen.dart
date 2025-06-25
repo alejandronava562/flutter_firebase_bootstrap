@@ -1,3 +1,5 @@
+// Users see this if they are not logged in
+
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
