@@ -34,7 +34,7 @@ class AuthGate extends StatelessWidget {
         }
 
         // User is not signed in
-        return const LoginScreen();
+        return LoginScreen();
       },
     );
   }
