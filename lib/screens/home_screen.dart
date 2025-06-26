@@ -14,9 +14,11 @@ class HomeScreen extends StatelessWidget {
       // Authgate will detect and redirect
     } catch (e) {
       // Exception handling
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Sign out error: $e")));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Sign out error: $e")));
+      }
     }
   }
 
