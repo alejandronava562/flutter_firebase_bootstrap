@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/firestore_service.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -10,6 +11,8 @@ class CategoryScreen extends StatefulWidget {
 class _CategoryScreenState extends State<CategoryScreen> {
   late String categoryLabel;
   late int maxItems;
+  late String categoryID;
+  final FirestoreService _firestoreService = FirestoreService();
   final List<String> items = [];
   final TextEditingController _controller = TextEditingController();
 
@@ -17,11 +20,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)!.settings.arguments as Map;
+    categoryID = args['id'] ?? 'unknown';
     categoryLabel = args['label'] ?? 'Unknown';
     maxItems = args['max'] ?? 5;
+
+    _loadItems();
   }
 
-  void _addItem() {
+  Future<void> _loadItems() async {
+    final loadedItems = await _firestoreService.getCategoryItems(categoryID);
+    setState(() {
+      items.clear();
+      items.addAll(loadedItems);
+    });
+  }
+
+  void _addItem() async {
     final text = _controller.text.trim();
     if (text.isEmpty || items.length >= maxItems) return;
 
@@ -29,12 +43,18 @@ class _CategoryScreenState extends State<CategoryScreen> {
       items.add(text);
       _controller.clear();
     });
+
+    // Firestore saving
+    await _firestoreService.saveCategoryItems(categoryID, items);
   }
 
-  void _removeItem(String item) {
+  void _removeItem(String item) async {
     setState(() {
       items.remove(item);
     });
+
+    // Firestore saving
+    await _firestoreService.saveCategoryItems(categoryID, items);
   }
 
   @override
