@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.green),
       home: AuthGate(),
       routes: {
+        '/login': (context) => LoginScreen(),
         '/category': (context) => const CategoryScreen(),
       },
     );
