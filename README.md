@@ -40,5 +40,5 @@ choose 5 veggies, 4 fruits, 3 proteins, 2 carbs, and 1 treat.
 ---
 
 ## Author & Contact
-Alejandro Nava Aldana Jr.
+Alejandro Nava Aldana Jr. : 
 ✉️ navaalejandro562@gmail.com
