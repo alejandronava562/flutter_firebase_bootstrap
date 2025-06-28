@@ -4,9 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/category_card.dart';
 import '../screens/review_screen.dart';
+import '../services/firestore_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
 
   // Sign out using Firebase
   Future<void> _signout(BuildContext context) async {
@@ -22,79 +26,95 @@ class HomeScreen extends StatelessWidget {
       }
     }
   }
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final FirestoreService _firestoreService = FirestoreService();
+  bool _isloading = true;
+
+  final List<Map<String, dynamic>> _categories = [
+    {'id': 'veggies', 'emoji': '🥦', 'label': 'Veggies', 'max': 5},
+    {'id': 'fruits', 'emoji': '🍓', 'label': 'Fruits', 'max': 4},
+    {'id': 'proteins', 'emoji': '🍗', 'label': 'Proteins', 'max': 3},
+    {'id': 'carbs', 'emoji': '🍚', 'label': 'Carbs', 'max': 2},
+    {'id': 'treats', 'emoji': '🍪', 'label': 'Treat', 'max': 1},
+  ];
+
+  final Map<String, int> _selectedCounts = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategoryCounts();
+  }
+
+  Future<void> _loadCategoryCounts() async {
+    for (var cat in _categories) {
+      final id = cat['id'] as String;
+      final items = await _firestoreService.getCategoryItems(id);
+      _selectedCounts[id] = items.length;
+    }
+    setState(() {
+      _isloading = false;
+    });
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Sign out error $e")));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final categories = [
-      {
-        'id': 'veggies',
-        'emoji': '🥦',
-        'label': 'Veggies',
-        'selected': 2,
-        'max': 5,
-      },
-      {
-        'id': 'fruits',
-        'emoji': '🍓',
-        'label': 'Fruits',
-        'selected': 1,
-        'max': 4,
-      },
-      {
-        'id': 'proteins',
-        'emoji': '🍗',
-        'label': 'Proteins',
-        'selected': 0,
-        'max': 3,
-      },
-      {'id': 'carbs', 'emoji': '🍚', 'label': 'Carbs', 'selected': 1, 'max': 2},
-      {
-        'id': 'treats',
-        'emoji': '🍪',
-        'label': 'Treats',
-        'selected': 0,
-        'max': 1,
-      },
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('54321 Grocery Planner'),
         actions: [
           IconButton(
-            onPressed: () => _signout(context),
+            onPressed: () => _signOut(context),
             icon: const Icon(Icons.logout),
             tooltip: 'Sign Out',
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: GridView.count(
-          crossAxisCount: 2, // two cards per row
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          children: categories.map((cat) {
-            return CategoryCard(
-              emoji: cat['emoji'] as String,
-              label: cat['label'] as String,
-              selectedCount: cat['selected'] as int,
-              maxCount: cat['max'] as int,
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/category',
-                  arguments: {
-                    'id': cat['id'],
-                    'label': cat['label'],
-                    'max': cat['max'],
-                  },
-                );
-              },
-            );
-          }).toList(),
-        ),
-      ),
+      body: _isloading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                children: _categories.map((cat) {
+                  final id = cat['id'] as String;
+                  return CategoryCard(
+                    emoji: cat['emoji'] as String,
+                    label: cat['label'] as String,
+                    selectedCount: _selectedCounts[id] ?? 0,
+                    maxCount: cat['max'] as int,
+                    onTap: () async {
+                      await Navigator.pushNamed(
+                        context,
+                        '/category',
+                        arguments: {
+                          'id': id,
+                          'label': cat['label'],
+                          'max': cat['max'],
+                        },
+                      );
+                      _loadCategoryCounts();
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.pushNamed(context, '/review');
