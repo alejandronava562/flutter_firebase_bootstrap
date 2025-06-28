@@ -22,10 +22,19 @@ class AuthService {
     );
   }
 
+  // Email/Password Sign Up
+  Future<UserCredential> registerWithEmail(
+    String email,
+    String password,
+  ) async {
+    return await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
   // Sign Out
   Future<void> signOut() async {
     return await _auth.signOut();
   }
 }
-
-

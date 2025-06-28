@@ -63,19 +63,17 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             if (_errorMessage != null)
-            Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+              Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
             _isloading
-              ? const CircularProgressIndicator()
-              : ElevatedButton(
-                onPressed: _login, 
-                child: const Text('Login')
-                ),
-              TextButton(
-                onPressed: _goToRegister, 
-                child: const Text("Don't have an account? Register"),
-                )
+                ? const CircularProgressIndicator()
+                : ElevatedButton(onPressed: _login, child: const Text('Login')),
+            TextButton(
+              onPressed: _goToRegister,
+              child: const Text("Don't have an account? Register"),
+            ),
           ],
-        ),)
+        ),
+      ),
     );
   }
 }
