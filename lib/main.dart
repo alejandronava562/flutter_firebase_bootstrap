@@ -7,7 +7,7 @@ import 'package:flutter_firebase_app/screens/category_screen.dart';
 import 'package:flutter_firebase_app/screens/register_screen.dart';
 import 'firebase_options.dart.';
 import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
+import 'screens/review_screen.dart';
 import 'auth_gate.dart';
 
 void main() async {
@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/category': (context) => const CategoryScreen(),
         '/register': (context) => RegisterScreen(),
+        '/review': (context) => ReviewScreen(),
       },
     );
   }

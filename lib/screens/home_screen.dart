@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/category_card.dart';
+import '../screens/review_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -96,7 +97,7 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // TODO: Push to ReviewList screen later
+          Navigator.pushNamed(context, '/review');
         },
         label: const Text("Review List"),
         icon: const Icon(Icons.check),
